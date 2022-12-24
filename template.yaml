@@ -1,0 +1,31 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: Serverless Application Template for AWS SAM
+
+Globals:
+  Function:
+    Timeout: 5
+    Runtime: go1.x
+    Architectures:
+      - x86_64
+
+Resources:
+  MonolithFinitoAPI:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: qa
+
+  GreetingFunction:
+    Type: AWS::Serverless::Function
+    StageName: qa
+    Properties:
+      FunctionName: "greetings"
+      CodeUri: ./cmd/functions/hello
+      Handler: hello
+      Events:
+        Greeting:
+          Type: Api
+          Properties:
+            RespApiId: !Ref MonolithFinitoAPI
+            Path: /greeting
+            Method: GET
