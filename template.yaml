@@ -9,15 +9,68 @@ Globals:
     Architectures:
       - x86_64
 
+Parameters:
+  Environment:
+    Type: String
+    Description: Environment name
+    Default: dev
+    AllowedValues:
+      - dev
+      - qa
+      - prod
+
+  LogLevel:
+    Type: String
+    Description: Log level
+    Default: DEBUG
+    AllowedValues:
+      - DEBUG
+      - INFO
+
 Resources:
   MonolithFinitoAPI:
     Type: AWS::Serverless::Api
     Properties:
-      StageName: qa
+      StageName: !Ref Environment
+
+  TransactionsTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: FinitoTransactions
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions:
+        - AttributeName: id
+          AttributeType: S
+        - AttributeName: sk
+          AttributeType: S
+      KeySchema:
+        - AttributeName: id
+          KeyType: HASH
+        - AttributeName: sk
+          KeyType: RANGE
+
+#  GetTransactionFunction:
+#    Type: AWS::Serverless::Function
+#    Properties:
+#      FunctionName:
+#      CodeUri: ./bin/
+#      Handler: getTransaction
+#      Events:
+#        GetTransaction:
+#          Type: Api
+#          Properties:
+#            Path: /transactions/{id}
+#            Method: get
+#            RestApiId: !Ref MonolithFinitoAPI
+#      Environment:
+#        Variables:
+#          TABLE_NAME: !Ref TransactionsTable
+#      Policies:
+#        - DynamoDBReadPolicy:
+#            TableName: !Ref TransactionsTable
 
   GreetingFunction:
     Type: AWS::Serverless::Function
-    StageName: qa
     Properties:
       FunctionName: "greetings"
       CodeUri: ./cmd/functions/hello
@@ -26,6 +79,9 @@ Resources:
         Greeting:
           Type: Api
           Properties:
-            RespApiId: !Ref MonolithFinitoAPI
+            RestApiId: !Ref MonolithFinitoAPI
             Path: /greeting
             Method: GET
+      Environment:
+        Variables:
+          LOG_LEVEL: !Ref LogLevel

@@ -1,0 +1,11 @@
+version = 0.1
+[default]
+[default.deploy]
+[default.deploy.parameters]
+stack_name = "finito-fly-qa"
+s3_bucket = "aws-sam-cli-managed-default-samclisourcebucket-1l4bxlyjxhy5a"
+s3_prefix = "finito-fly-qa"
+region = "us-west-1"
+capabilities = "CAPABILITY_IAM"
+image_repositories = []
+confirm_changeset = true
